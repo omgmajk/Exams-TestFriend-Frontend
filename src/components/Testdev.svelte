@@ -87,11 +87,11 @@
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            id: hm_id.value,
-            plan_id: edit_plan_id.value,
-            suite_id: edit_suite_id.value,
-            case_name: edit_case_name.value,
-            case_description: edit_case_description.value,
+            id: hm_id,
+            plan_id: edit_plan_id,
+            suite_id: edit_suite_id,
+            case_name: edit_case_name,
+            case_description: edit_case_description,
           }),
         }
       );
@@ -99,6 +99,7 @@
       if (data.changes) {
         refreshData();
         errorMessage = "";
+        edited_id = hm_id;
       } else {
         errorMessage = data.error;
       }
@@ -120,6 +121,7 @@
           <th>Test Suite ID</th>
           <th>Test Case Name</th>
           <th>Test Case Description</th>
+          <th>Outcome</th>
           <th>Edit Test Case</th>
           <th>Delete Test Case</th>
         </tr>
@@ -135,6 +137,7 @@
               <th>{test.suite_id}</th>
               <td>{test.case_name}</td>
               <td>{test.case_description}</td>
+              <td>Pass</td>
               <td>
                 <button
                   class="btn-sm btn-primary w-full max-w-xs"
@@ -218,6 +221,8 @@
     <div class="w-full max-w-xs">
       {#if errorMessage}
         <h2 class="text-center text-xl text-red-600">{errorMessage}</h2>
+      {:else if edited_id}
+      <h2 class="text-center text-xl text-green-600">Edited test case with id: {edited_id}</h2>
       {:else}
         <h2 class="text-center text-xl">Edit Test Case</h2>
       {/if}
@@ -232,7 +237,7 @@
             class="input input-bordered w-full max-w-xs"
             id="hm_id"
             type="text"
-            placeholder="Test Plan ID"
+            placeholder="Test ID"
           />
         </div>
         <div class="mb-2">

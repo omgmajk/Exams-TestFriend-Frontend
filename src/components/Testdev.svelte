@@ -1,33 +1,28 @@
 <script>
-import { onMount } from "svelte";
-
+  import { onMount } from "svelte";
   let cases = [];
-
   onMount(async () => {
     const res = await fetch("http://localhost:3000/api/test_case/");
     cases = await res.json();
   });
-
   let plan_id;
   let suite_id;
   let case_name;
   let case_description;
 
+  let hm_id;
   let edit_plan_id;
   let edit_suite_id;
   let edit_case_name;
   let edit_case_description;
   let edited_id;
-
   let errorMessage;
-
   async function refreshData() {
-    const res = await fetch('http://localhost:3000/api/test_case/');
+    const res = await fetch("http://localhost:3000/api/test_case/");
     cases = await res.json();
   }
-  
-  const addTestCase = async () => {
 
+  const addTestCase = async () => {
     try {
       const response = await fetch(`http://localhost:3000/api/test_case/`, {
         method: "POST",
@@ -42,20 +37,17 @@ import { onMount } from "svelte";
         }),
       });
       const data = await response.json();
-
       if (data.changes) {
         refreshData();
-        errorMessage = '';
+        errorMessage = "";
       } else {
         errorMessage = data.error;
       }
-
       //console.log(data);
     } catch (error) {
       console.log(error);
     }
   };
-
   const deleteTestCase = async (id) => {
     try {
       const response = await fetch(
@@ -69,52 +61,51 @@ import { onMount } from "svelte";
       console.log(error);
     }
   };
-
   let editing = false;
-
   const editTestCase = async (id, test) => {
     try {
       const response = await fetch(`http://localhost:3000/api/test_case/${id}`);
       const data = await response.json();
+      hm_id = id;
       edit_plan_id = data.plan_id;
       edit_suite_id = data.suite_id;
       edit_case_name = data.case_name;
       edit_case_description = data.case_description;
       editing = true;
-      edited_id = id;
     } catch (error) {
       console.log(error);
     }
   };
-
   const editedTestCase = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/api/test_case/${edited_id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          plan_id: edit_plan_id,
-          suite_id: edit_suite_id,
-          case_name: edit_case_name,
-          case_description: edit_case_description,
-        }),
-      });
+      const response = await fetch(
+        `http://localhost:3000/api/test_case/${hm_id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: hm_id.value,
+            plan_id: edit_plan_id.value,
+            suite_id: edit_suite_id.value,
+            case_name: edit_case_name.value,
+            case_description: edit_case_description.value,
+          }),
+        }
+      );
       const data = await response.json();
-
       if (data.changes) {
         refreshData();
-        errorMessage = '';
+        errorMessage = "";
       } else {
         errorMessage = data.error;
       }
-
-      //console.log(data);
+      console.log(data);
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 </script>
 
 <div class="md:flex md:justify-center mt-20 mb-20">
@@ -234,6 +225,15 @@ import { onMount } from "svelte";
         on:submit|preventDefault={editedTestCase}
       >
         <!-- <input type="hidden" id="id" bind:value{edited_id} -->
+        <div class="mb-2">
+          <input
+            bind:value={hm_id}
+            class="input input-bordered w-full max-w-xs"
+            id="hm_id"
+            type="text"
+            placeholder="Test Plan ID"
+          />
+        </div>
         <div class="mb-2">
           <input
             bind:value={edit_plan_id}

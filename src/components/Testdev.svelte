@@ -77,6 +77,7 @@
     }
   };
   const editedTestCase = async () => {
+      console.log(hm_id, edit_plan_id, edit_suite_id, edit_case_name, edit_case_description);
     try {
       const response = await fetch(
         `http://localhost:3000/api/test_case/${hm_id}`,

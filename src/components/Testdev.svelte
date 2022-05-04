@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from "svelte";
+import { onMount } from "svelte";
 
   let cases = [];
 
@@ -12,6 +12,12 @@
   let suite_id;
   let case_name;
   let case_description;
+
+  let edit_plan_id;
+  let edit_suite_id;
+  let edit_case_name;
+  let edit_case_description;
+  let edited_id;
 
   let errorMessage;
 
@@ -46,7 +52,7 @@
 
       //console.log(data);
     } catch (error) {
-      //console.log(error);
+      console.log(error);
     }
   };
 
@@ -64,29 +70,51 @@
     }
   };
 
-  const editTestCase = async (id) => {
-    try {
-      const response = await fetch(
-        `http://localhost:3000/api/test_case/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            plan_id: plan_id,
-            suite_id: suite_id,
-            case_name: case_name,
-            case_description: case_description,
-          }),
-        }
-      );
+  let editing = false;
 
-      console.log(await response.json());
+  const editTestCase = async (id, test) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/test_case/${id}`);
+      const data = await response.json();
+      edit_plan_id = data.plan_id;
+      edit_suite_id = data.suite_id;
+      edit_case_name = data.case_name;
+      edit_case_description = data.case_description;
+      editing = true;
+      edited_id = id;
     } catch (error) {
       console.log(error);
     }
   };
+
+  const editedTestCase = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/test_case/${edited_id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          plan_id: edit_plan_id,
+          suite_id: edit_suite_id,
+          case_name: edit_case_name,
+          case_description: edit_case_description,
+        }),
+      });
+      const data = await response.json();
+
+      if (data.changes) {
+        refreshData();
+        errorMessage = '';
+      } else {
+        errorMessage = data.error;
+      }
+
+      //console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 </script>
 
 <div class="md:flex md:justify-center mt-20 mb-20">
@@ -100,8 +128,8 @@
           <th>Test Suite ID</th>
           <th>Test Case Name</th>
           <th>Test Case Description</th>
-          <th>Delete Test Case</th>
           <th>Edit Test Case</th>
+          <th>Delete Test Case</th>
         </tr>
       </thead>
       <tbody>
@@ -115,18 +143,18 @@
               <th>{test.suite_id}</th>
               <td>{test.case_name}</td>
               <td>{test.case_description}</td>
-              <td
-                ><button
+              <td>
+                <button
                   class="btn-sm btn-primary w-full max-w-xs"
-                  on:click={() => editTestCase(test.id)}>Edit</button
-                ></td
-              >
-              <td
-                ><button
+                  on:click={() => editTestCase(test.id, test)}>Edit</button
+                >
+              </td>
+              <td>
+                <button
                   class="btn-sm btn-primary w-full max-w-xs"
                   on:click={() => deleteTestCase(test.id)}>Delete</button
-                ></td
-              >
+                >
+              </td>
             </tr>
           {/each}
         {:catch error}
@@ -137,59 +165,117 @@
   </div>
 </div>
 
-<div class="md:flex md:justify-center mt-20">
-  <div class="w-full max-w-xs">
-    {#if errorMessage}
-      <h2 class="text-center text-xl text-red-600">{errorMessage}</h2>
-    {:else}
-      <h2 class="text-center text-xl">Add new Test Case</h2>
-    {/if}
-    
-    <form
-      class="shadow-md rounded px-1 pt-6 pb-8 mb-4"
-      on:submit|preventDefault={addTestCase}
-    >
-      <div class="mb-2">
-        <input
-          class="input input-bordered w-full max-w-xs"
-          id="plan_id"
-          type="text"
-          bind:value={plan_id}
-          placeholder="Test Plan ID"
-        />
-      </div>
-      <div class="mb-2">
-        <input
-          class="input input-bordered w-full max-w-xs"
-          id="suite_id"
-          type="text"
-          bind:value={suite_id}
-          placeholder="Test Suite ID"
-        />
-      </div>
-      <div class="mb-2">
-        <input
-          class="input input-bordered w-full max-w-xs"
-          id="case_name"
-          type="text"
-          bind:value={case_name}
-          placeholder="Test Case Name"
-        />
-      </div>
-      <div>
-        <textarea
-          id="case_description"
-          class="textarea textarea-bordered mt-2 w-full max-w-xs"
-          rows="6"
-          bind:value={case_description}
-          placeholder="Test Case Description"
-        />
-      </div>
-      <div class="flex items-center justify-between">
-        <button class="btn btn-primary mt-2 w-full max-w-xs" type="submit">
-          Add Test Case
-        </button>
-      </div>
-    </form>
+{#if !editing}
+  <div class="md:flex md:justify-center mt-20">
+    <div class="w-full max-w-xs">
+      {#if errorMessage}
+        <h2 class="text-center text-xl text-red-600">{errorMessage}</h2>
+      {:else}
+        <h2 class="text-center text-xl">Add new Test Case</h2>
+      {/if}
+      <form
+        class="shadow-md rounded px-1 pt-6 pb-8 mb-4"
+        on:submit|preventDefault={addTestCase}
+      >
+        <div class="mb-2">
+          <input
+            bind:value={plan_id}
+            class="input input-bordered w-full max-w-xs"
+            id="plan_id"
+            type="text"
+            placeholder="Test Plan ID"
+          />
+        </div>
+        <div class="mb-2">
+          <input
+            bind:value={suite_id}
+            class="input input-bordered w-full max-w-xs"
+            id="suite_id"
+            type="text"
+            placeholder="Test Suite ID"
+          />
+        </div>
+        <div class="mb-2">
+          <input
+            bind:value={case_name}
+            class="input input-bordered w-full max-w-xs"
+            id="case_name"
+            type="text"
+            placeholder="Test Case Name"
+          />
+        </div>
+        <div>
+          <textarea
+            bind:value={case_description}
+            id="case_description"
+            class="textarea textarea-bordered mt-2 w-full max-w-xs"
+            rows="6"
+            placeholder="Test Case Description"
+          />
+        </div>
+        <div class="flex items-center justify-between">
+          <button class="btn btn-primary mt-2 w-full max-w-xs" type="submit">
+            Add Test Case
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
-</div>
+{:else}
+  <div class="md:flex md:justify-center mt-20">
+    <div class="w-full max-w-xs">
+      {#if errorMessage}
+        <h2 class="text-center text-xl text-red-600">{errorMessage}</h2>
+      {:else}
+        <h2 class="text-center text-xl">Edit Test Case</h2>
+      {/if}
+      <form
+        class="shadow-md rounded px-1 pt-6 pb-8 mb-4"
+        on:submit|preventDefault={editedTestCase}
+      >
+        <!-- <input type="hidden" id="id" bind:value{edited_id} -->
+        <div class="mb-2">
+          <input
+            bind:value={edit_plan_id}
+            class="input input-bordered w-full max-w-xs"
+            id="plan_id"
+            type="text"
+            placeholder="Test Plan ID"
+          />
+        </div>
+        <div class="mb-2">
+          <input
+            bind:value={edit_suite_id}
+            class="input input-bordered w-full max-w-xs"
+            id="suite_id"
+            type="text"
+            placeholder="Test Suite ID"
+          />
+        </div>
+        <div class="mb-2">
+          <input
+            bind:value={edit_case_name}
+            class="input input-bordered w-full max-w-xs"
+            id="case_name"
+            type="text"
+            placeholder="Test Case Name"
+          />
+        </div>
+        <div>
+          <textarea
+            bind:value={edit_case_description}
+            id="case_description"
+            class="textarea textarea-bordered mt-2 w-full max-w-xs"
+            rows="6"
+            placeholder="Test Case Description"
+          />
+        </div>
+        <div class="flex items-center justify-between">
+          <button class="btn btn-primary mt-2 w-full max-w-xs" type="submit">
+            Edit Test Case
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+{/if}

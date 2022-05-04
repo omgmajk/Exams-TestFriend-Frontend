@@ -1,5 +1,7 @@
 <script>
   import { onMount } from "svelte";
+  import { slide } from 'svelte/transition';
+
   let cases = [];
   onMount(async () => {
     const res = await fetch("http://localhost:3000/api/test_case/");
@@ -231,7 +233,7 @@
         on:submit|preventDefault={editedTestCase}
       >
         <!-- <input type="hidden" id="id" bind:value{edited_id} -->
-        <div class="mb-2">
+        <div class="mb-2" transition:slide>
           <input
             bind:value={hm_id}
             class="input input-bordered w-full max-w-xs"

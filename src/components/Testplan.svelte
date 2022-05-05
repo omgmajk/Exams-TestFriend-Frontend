@@ -173,7 +173,7 @@
             class="input input-bordered w-full max-w-xs"
             id="plan_name"
             type="text"
-            placeholder="Plan Name"
+            placeholder="Test Plan Name"
           />
         </div>
         <div class="mb-2">
@@ -182,7 +182,7 @@
             id="case_description"
             class="textarea textarea-bordered mt-2 w-full max-w-xs"
             rows="6"
-            placeholder="Case Description"
+            placeholder="Test Plan Description"
           />
         </div>
         <div class="flex items-center justify-between">
@@ -203,7 +203,7 @@
           Edited test plan with id: {edited_id}
         </h2>
       {:else}
-        <h2 class="text-center text-xl">Edit Test Case</h2>
+        <h2 class="text-center text-xl">Edit Test Plan</h2>
       {/if}
       <form
         class="shadow-md rounded px-1 pt-6 pb-8 mb-4"
@@ -216,7 +216,7 @@
             class="input input-bordered w-full max-w-xs"
             id="hm_id"
             type="text"
-            placeholder="Test ID"
+            placeholder="Test Plan ID"
           />
         </div>
         <!-- <div class="mb-2">

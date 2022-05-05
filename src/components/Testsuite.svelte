@@ -272,7 +272,7 @@
             class="input input-bordered w-full max-w-xs"
             id="case_name"
             type="text"
-            placeholder="Test Case Name"
+            placeholder="Test Suite Name"
           />
         </div>
         <div>
@@ -281,12 +281,12 @@
             id="case_description"
             class="textarea textarea-bordered mt-2 w-full max-w-xs"
             rows="6"
-            placeholder="Test Case Description"
+            placeholder="Test Suite Description"
           />
         </div>
         <div class="flex items-center justify-between">
           <button class="btn btn-primary mt-2 w-full max-w-xs" type="submit">
-            Edit Test Case
+            Edit Test Suite
           </button>
         </div>
       </form>

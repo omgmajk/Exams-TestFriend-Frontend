@@ -1,12 +1,14 @@
 <script>
   import { onMount } from "svelte";
-  import { slide } from 'svelte/transition';
+  import { slide } from "svelte/transition";
 
   let cases = [];
+
   onMount(async () => {
     const res = await fetch("http://localhost:3000/api/test_case/");
     cases = await res.json();
   });
+
   let plan_id;
   let suite_id;
   let case_name;
@@ -17,8 +19,10 @@
   let edit_suite_id;
   let edit_case_name;
   let edit_case_description;
+
   let edited_id;
   let errorMessage;
+
   async function refreshData() {
     const res = await fetch("http://localhost:3000/api/test_case/");
     cases = await res.json();
@@ -50,6 +54,7 @@
       console.log(error);
     }
   };
+
   const deleteTestCase = async (id) => {
     try {
       const response = await fetch(
@@ -63,7 +68,9 @@
       console.log(error);
     }
   };
+
   let editing = false;
+
   const editTestCase = async (id, test) => {
     try {
       const response = await fetch(`http://localhost:3000/api/test_case/${id}`);
@@ -78,8 +85,8 @@
       console.log(error);
     }
   };
+
   const editedTestCase = async () => {
-      console.log(hm_id, edit_plan_id, edit_suite_id, edit_case_name, edit_case_description);
     try {
       const response = await fetch(
         `http://localhost:3000/api/test_case/${hm_id}`,
@@ -224,7 +231,9 @@
       {#if errorMessage}
         <h2 class="text-center text-xl text-red-600">{errorMessage}</h2>
       {:else if edited_id}
-      <h2 class="text-center text-xl text-green-600">Edited test case with id: {edited_id}</h2>
+        <h2 class="text-center text-xl text-green-600">
+          Edited test case with id: {edited_id}
+        </h2>
       {:else}
         <h2 class="text-center text-xl">Edit Test Case</h2>
       {/if}
